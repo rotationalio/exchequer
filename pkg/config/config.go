@@ -25,6 +25,7 @@ type Config struct {
 	LogLevel    logger.LevelDecoder `split_words:"true" default:"info" desc:"specify the verbosity of logging (trace, debug, info, warn, error, fatal panic)"`
 	ConsoleLog  bool                `split_words:"true" default:"false" desc:"if true logs colorized human readable output instead of json"`
 	BindAddr    string              `split_words:"true" default:"8204" desc:"the ip address and port to bind the web service on"`
+	Origin      string              `default:"http://localhost:8204" desc:"origin (url) of the user interface for CORS access"`
 	processed   bool
 }
 

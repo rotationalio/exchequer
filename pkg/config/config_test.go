@@ -15,6 +15,7 @@ var testEnv = map[string]string{
 	"EXCHEQUER_LOG_LEVEL":   "debug",
 	"EXCHEQUER_CONSOLE_LOG": "true",
 	"EXCHEQUER_BIND_ADDR":   ":9000",
+	"EXCHEQUER_ORIGIN":      "http://localhost:9000",
 }
 
 func TestConfig(t *testing.T) {
@@ -32,6 +33,7 @@ func TestConfig(t *testing.T) {
 	require.Equal(t, zerolog.DebugLevel, conf.GetLogLevel())
 	require.True(t, conf.ConsoleLog)
 	require.Equal(t, testEnv["EXCHEQUER_BIND_ADDR"], conf.BindAddr)
+	require.Equal(t, testEnv["EXCHEQUER_ORIGIN"], conf.Origin)
 }
 
 // Returns the current environment for the specified keys, or if no keys are specified
