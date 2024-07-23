@@ -19,4 +19,12 @@
 
 # Go workspace file
 go.work
-go.work.sum
+
+.env
+.secret
+
+node_modules
+tmp
+
+# OS Droppings
+.DS_Store
