@@ -7,20 +7,25 @@ import (
 	"encoding/pem"
 	"fmt"
 	"os"
+	"text/tabwriter"
 
 	"github.com/joho/godotenv"
 	"github.com/oklog/ulid/v2"
 	"github.com/urfave/cli/v2"
 
 	"github.com/rotationalio/exchequer/pkg"
+	"github.com/rotationalio/exchequer/pkg/config"
+	"github.com/rotationalio/exchequer/pkg/exchequer"
+
+	confire "github.com/rotationalio/confire/usage"
 )
 
 func main() {
 	godotenv.Load()
 
 	app := cli.NewApp()
-	app.Name = "envoy"
-	app.Usage = "serve and manage the TRISA Envoy self-hosted node"
+	app.Name = "exchequer"
+	app.Usage = "serve and manage the exchequer billing service"
 	app.Version = pkg.Version()
 	app.Flags = []cli.Flag{}
 	app.Commands = []*cli.Command{
@@ -72,35 +77,35 @@ func main() {
 //===========================================================================
 
 func serve(c *cli.Context) (err error) {
-	// var conf config.Config
-	// if conf, err = config.New(); err != nil {
-	// 	return cli.Exit(err, 1)
-	// }
+	var conf config.Config
+	if conf, err = config.New(); err != nil {
+		return cli.Exit(err, 1)
+	}
 
-	// var trisa *node.Node
-	// if trisa, err = node.New(conf); err != nil {
-	// 	return cli.Exit(err, 1)
-	// }
+	var svc *exchequer.Server
+	if svc, err = exchequer.New(conf); err != nil {
+		return cli.Exit(err, 1)
+	}
 
-	// if err = trisa.Serve(); err != nil {
-	// 	return cli.Exit(err, 1)
-	// }
+	if err = svc.Serve(); err != nil {
+		return cli.Exit(err, 1)
+	}
 	return nil
 }
 
 func usage(c *cli.Context) error {
-	// tabs := tabwriter.NewWriter(os.Stdout, 1, 0, 4, ' ', 0)
-	// format := confire.DefaultTableFormat
-	// if c.Bool("list") {
-	// 	format = confire.DefaultListFormat
-	// }
+	tabs := tabwriter.NewWriter(os.Stdout, 1, 0, 4, ' ', 0)
+	format := confire.DefaultTableFormat
+	if c.Bool("list") {
+		format = confire.DefaultListFormat
+	}
 
-	// var conf config.Config
-	// if err := confire.Usagef(config.Prefix, &conf, tabs, format); err != nil {
-	// 	return cli.Exit(err, 1)
-	// }
+	var conf config.Config
+	if err := confire.Usagef(config.Prefix, &conf, tabs, format); err != nil {
+		return cli.Exit(err, 1)
+	}
 
-	// tabs.Flush()
+	tabs.Flush()
 	return nil
 }
 
@@ -144,23 +149,23 @@ func generateTokenKey(c *cli.Context) (err error) {
 // Helper Functions
 //===========================================================================
 
-func openDB(c *cli.Context) (err error) {
-	// if conf, err = config.New(); err != nil {
-	// 	return cli.Exit(err, 1)
-	// }
+// func openDB(c *cli.Context) (err error) {
+// 	if conf, err = config.New(); err != nil {
+// 		return cli.Exit(err, 1)
+// 	}
 
-	// if db, err = store.Open(conf.DatabaseURL); err != nil {
-	// 	return cli.Exit(err, 1)
-	// }
+// 	if db, err = store.Open(conf.DatabaseURL); err != nil {
+// 		return cli.Exit(err, 1)
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
-func closeDB(c *cli.Context) error {
-	// if db != nil {
-	// 	if err := db.Close(); err != nil {
-	// 		return cli.Exit(err, 1)
-	// 	}
-	// }
-	return nil
-}
+// func closeDB(c *cli.Context) error {
+// 	if db != nil {
+// 		if err := db.Close(); err != nil {
+// 			return cli.Exit(err, 1)
+// 		}
+// 	}
+// 	return nil
+// }
