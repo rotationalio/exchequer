@@ -9,11 +9,18 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/adyen/adyen-go-api-library/v11/src/adyen"
+	"github.com/adyen/adyen-go-api-library/v11/src/common"
 	"github.com/adyen/adyen-go-api-library/v11/src/webhook"
 	"github.com/gin-gonic/gin"
 	"github.com/rotationalio/exchequer/pkg/api/v1"
+	"github.com/rotationalio/exchequer/pkg/config"
 	"github.com/rs/zerolog/log"
 )
+
+//===========================================================================
+// Adyen Related Middleware
+//===========================================================================
 
 func (s *Server) AdyenWebhookAuth() gin.HandlerFunc {
 	if s.conf.Adyen.Webhook.UseBasicAuth {
@@ -27,6 +34,10 @@ func (s *Server) AdyenWebhookAuth() gin.HandlerFunc {
 		c.Next()
 	}
 }
+
+//===========================================================================
+// Adyen Handlers
+//===========================================================================
 
 func (s *Server) AdyenPaymentsWebhook(c *gin.Context) {
 	var (
@@ -73,6 +84,10 @@ func (s *Server) AdyenPaymentsWebhook(c *gin.Context) {
 
 	c.Status(http.StatusAccepted)
 }
+
+//===========================================================================
+// Adyen Helper Methods
+//===========================================================================
 
 func VerifyAdyenHMAC(payload *webhook.NotificationRequestItem, secret string) (err error) {
 	// Step 1: Extract the HMAC signature to verify from the additonal data.
@@ -121,4 +136,19 @@ func VerifyAdyenHMAC(payload *webhook.NotificationRequestItem, secret string) (e
 		return ErrInvalidHMACSignature
 	}
 	return nil
+}
+
+func CreateAdyenClient(conf config.AdyenConfig) *adyen.APIClient {
+	if conf.Live {
+		return adyen.NewClient(&common.Config{
+			ApiKey:                conf.APIKey,
+			Environment:           common.LiveEnv,
+			LiveEndpointURLPrefix: conf.URLPrefix,
+		})
+	}
+
+	return adyen.NewClient(&common.Config{
+		ApiKey:      conf.APIKey,
+		Environment: common.TestEnv,
+	})
 }

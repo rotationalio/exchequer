@@ -16,7 +16,9 @@ var testEnv = map[string]string{
 	"EXCHEQUER_CONSOLE_LOG":                  "true",
 	"EXCHEQUER_BIND_ADDR":                    ":9000",
 	"EXCHEQUER_ORIGIN":                       "http://localhost:9000",
+	"EXCHEQUER_ADYEN_MERCHANT_ACCOUNT":       "MyCompanyECOM",
 	"EXCHEQUER_ADYEN_API_KEY":                "my api key",
+	"EXCHEQUER_ADYEN_CLIENT_KEY":             "my client key",
 	"EXCHEQUER_ADYEN_LIVE":                   "true",
 	"EXCHEQUER_ADYEN_URL_PREFIX":             "1797a841fbb37ca7-AdyenDemo",
 	"EXCHEQUER_ADYEN_WEBHOOK_USE_BASIC_AUTH": "true",
@@ -42,7 +44,9 @@ func TestConfig(t *testing.T) {
 	require.True(t, conf.ConsoleLog)
 	require.Equal(t, testEnv["EXCHEQUER_BIND_ADDR"], conf.BindAddr)
 	require.Equal(t, testEnv["EXCHEQUER_ORIGIN"], conf.Origin)
+	require.Equal(t, testEnv["EXCHEQUER_ADYEN_MERCHANT_ACCOUNT"], conf.Adyen.MerchantAccount)
 	require.Equal(t, testEnv["EXCHEQUER_ADYEN_API_KEY"], conf.Adyen.APIKey)
+	require.Equal(t, testEnv["EXCHEQUER_ADYEN_CLIENT_KEY"], conf.Adyen.ClientKey)
 	require.True(t, conf.Adyen.Live)
 	require.Equal(t, testEnv["EXCHEQUER_ADYEN_URL_PREFIX"], conf.Adyen.URLPrefix)
 	require.True(t, conf.Adyen.Webhook.UseBasicAuth)

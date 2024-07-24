@@ -13,12 +13,14 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/adyen/adyen-go-api-library/v11/src/adyen"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+
 	"github.com/rotationalio/exchequer/pkg/config"
 	"github.com/rotationalio/exchequer/pkg/logger"
 	"github.com/rotationalio/exchequer/pkg/metrics"
-	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 )
 
 func init() {
@@ -59,8 +61,9 @@ func New(conf config.Config) (svc *Server, err error) {
 	}
 
 	svc = &Server{
-		conf: conf,
-		errc: make(chan error, 1),
+		conf:  conf,
+		errc:  make(chan error, 1),
+		adyen: CreateAdyenClient(conf.Adyen),
 	}
 
 	// Configure the gin router if enabled
@@ -93,6 +96,7 @@ type Server struct {
 	conf    config.Config
 	srv     *http.Server
 	router  *gin.Engine
+	adyen   *adyen.APIClient
 	url     *url.URL
 	started time.Time
 	healthy bool

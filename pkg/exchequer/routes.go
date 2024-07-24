@@ -75,6 +75,7 @@ func (s *Server) setupRoutes() (err error) {
 
 	// Pages
 	s.router.GET("/", s.Index)
+	s.router.GET("/checkout", s.Checkout)
 
 	// API Routes (Including Content Negotiated Partials)
 	v1 := s.router.Group("/v1")
