@@ -86,7 +86,7 @@ func (s *Server) setupRoutes() (err error) {
 		// Adyen JSON webhooks and integration
 		adyen := v1.Group("/adyen", s.AdyenWebhookAuth())
 		{
-			adyen.GET("/payments", s.AdyenPaymentsWebhook)
+			adyen.POST("/payments", s.AdyenPaymentsWebhook)
 		}
 	}
 
