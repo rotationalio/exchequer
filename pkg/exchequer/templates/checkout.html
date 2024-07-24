@@ -1,0 +1,58 @@
+{{ template "base" . }}
+{{ define "styles" }}
+  <!-- Embed the Adyen Web stylesheet. You can add your own styling by overriding the rules in the CSS file -->
+  <link rel="stylesheet" href="https://checkoutshopper-live.adyen.com/checkoutshopper/sdk/5.66.1/adyen.css"
+    integrity="sha384-gpOE6R0K50VgXe6u/pyjzkKl4Kr8hXu93KUCTmC4LqbO9mpoGUYsrmeVLcp2eejn"
+    crossorigin="anonymous">
+{{ end }}
+
+{{ define "content" }}
+
+<section class="text-center py-14">
+  <h1>Checkout</h1>
+  <div id="adyen-dropin"></div>
+</section>
+
+{{ end }}
+
+{{ define "appcode" }}
+	<!-- Embed the Adyen Web script element above any other JavaScript in your checkout page. -->
+  <script src="https://checkoutshopper-live.adyen.com/checkoutshopper/sdk/5.66.1/adyen.js"
+    integrity="sha384-1hIjspaI91zaZaaFP4++yNNBE9emITOdAAnKcDsVFvA8agUeXq/b9Fh+9q0fx2/2"
+    crossorigin="anonymous"></script>
+  <script>
+    const configuration = {
+      environment: "test",
+      clientKey: "{{ .ClientKey }}",
+      analytics: {
+        enabled: true
+      },
+      session: {
+        id: "{{ .SessionID }}",
+        sessionData: "{{ .SessionData }}"
+      },
+      onPaymentCompleted: (result, component) => {
+          console.info(result, component);
+      },
+      onError: (error, component) => {
+          console.error(error.name, error.message, error.stack, component);
+      },
+      paymentMethodsConfiguration: {
+        card: {
+          hasHolderName: true,
+          holderNameRequired: true,
+          billingAddressRequired: true
+        }
+      }
+    };
+
+    const setupAdyen = async () => {
+      console.log("setting up adyen dropin");
+      const checkout = await AdyenCheckout(configuration);
+      const dropinComponent = checkout.create('dropin').mount('#adyen-dropin');
+      console.log("adyen dropin configuration complete");
+    }
+
+    setupAdyen();
+  </script>
+{{ end }}

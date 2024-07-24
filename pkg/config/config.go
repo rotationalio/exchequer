@@ -33,10 +33,12 @@ type Config struct {
 }
 
 type AdyenConfig struct {
-	APIKey    string `split_words:"true" required:"true" desc:"api key for adyen payments api access"`
-	Live      bool   `default:"false" desc:"set to true to enable live payments and access to the live environment"`
-	URLPrefix string `split_words:"true" desc:"the live endpoint url prefix used to access the live environment"`
-	Webhook   AdyenWebhookConfig
+	MerchantAccount string `split_words:"true" required:"true" desc:"the merchant account name configured in adyen"`
+	APIKey          string `split_words:"true" required:"true" desc:"api key for adyen payments api access"`
+	ClientKey       string `split_words:"true" required:"true" desc:"client key for adyen web drop-in"`
+	Live            bool   `default:"false" desc:"set to true to enable live payments and access to the live environment"`
+	URLPrefix       string `split_words:"true" desc:"the live endpoint url prefix used to access the live environment"`
+	Webhook         AdyenWebhookConfig
 }
 
 type AdyenWebhookConfig struct {
