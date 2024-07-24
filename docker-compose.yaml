@@ -1,0 +1,18 @@
+services:
+  exchequer:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        GIT_REVISION: ${GIT_REVISION}
+    image: rotationalio/exchequer
+    init: true
+    ports:
+      - 8204:8204
+    environment:
+      - EXCHEQUER_MAINTENANCE=false
+      - EXCHEQUER_MODE=release
+      - EXCHEQUER_LOG_LEVEL=debug
+      - EXCHEQUER_CONSOLE_LOG=true
+      - EXCHEQUER_BIND_ADDR=:8204
+      - EXCHEQUER_ORIGIN=http://localhost:8204
