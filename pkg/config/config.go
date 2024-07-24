@@ -1,6 +1,8 @@
 package config
 
 import (
+	"encoding/hex"
+	"errors"
 	"fmt"
 
 	"github.com/gin-gonic/gin"
@@ -26,7 +28,23 @@ type Config struct {
 	ConsoleLog  bool                `split_words:"true" default:"false" desc:"if true logs colorized human readable output instead of json"`
 	BindAddr    string              `split_words:"true" default:"8204" desc:"the ip address and port to bind the web service on"`
 	Origin      string              `default:"http://localhost:8204" desc:"origin (url) of the user interface for CORS access"`
+	Adyen       AdyenConfig
 	processed   bool
+}
+
+type AdyenConfig struct {
+	APIKey    string `split_words:"true" required:"true" desc:"api key for adyen payments api access"`
+	Live      bool   `default:"false" desc:"set to true to enable live payments and access to the live environment"`
+	URLPrefix string `split_words:"true" desc:"the live endpoint url prefix used to access the live environment"`
+	Webhook   AdyenWebhookConfig
+}
+
+type AdyenWebhookConfig struct {
+	UseBasicAuth bool   `split_words:"true" default:"false" desc:"verify adyen webhooks with basic authentication"`
+	Username     string `default:"" desc:"if basic auth is enabled, provide the configured username"`
+	Password     string `default:"" desc:"if basic auth is enabled, provide the configured password in plaintext"`
+	VerifyHMAC   bool   `split_words:"true" default:"false" desc:"if true, verify the hmac in the additional details of the webhook"`
+	HMACSecret   string `split_words:"true" desc:"specify the configured hmac secret for message verification"`
 }
 
 func New() (conf Config, err error) {
@@ -55,9 +73,47 @@ func (c Config) Validate() (err error) {
 		return fmt.Errorf("invalid configuration: %q is not a valid gin mode", c.Mode)
 	}
 
+	if err = c.Adyen.Validate(); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (c Config) GetLogLevel() zerolog.Level {
 	return zerolog.Level(c.LogLevel)
+}
+
+func (c AdyenConfig) Validate() error {
+	if c.Live {
+		if c.URLPrefix == "" {
+			return errors.New("invalid configuration: url prefix is required when in live mode")
+		}
+	}
+
+	if err := c.Webhook.Validate(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c AdyenWebhookConfig) Validate() error {
+	if c.UseBasicAuth {
+		if c.Username == "" || c.Password == "" {
+			return errors.New("invalid configuration: username and password required when basic auth is enabled")
+		}
+	}
+
+	if c.VerifyHMAC {
+		if c.HMACSecret == "" {
+			return errors.New("invalid configuration: hmac secret is required when verify hmac is enabled")
+		}
+
+		if _, err := hex.DecodeString(c.HMACSecret); err != nil {
+			return errors.New("invalid configuration:  hmac secret must be a hex encoded string")
+		}
+	}
+
+	return nil
 }

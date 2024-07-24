@@ -81,6 +81,12 @@ func (s *Server) setupRoutes() (err error) {
 	{
 		// Status/Heartbeat endpoint
 		v1.GET("/status", s.Status)
+
+		// Adyen JSON webhooks and integration
+		adyen := v1.Group("/adyen", s.AdyenWebhookAuth())
+		{
+			adyen.GET("/payments", s.AdyenPaymentsWebhook)
+		}
 	}
 
 	return nil

@@ -10,12 +10,20 @@ import (
 )
 
 var testEnv = map[string]string{
-	"EXCHEQUER_MAINTENANCE": "true",
-	"EXCHEQUER_MODE":        "test",
-	"EXCHEQUER_LOG_LEVEL":   "debug",
-	"EXCHEQUER_CONSOLE_LOG": "true",
-	"EXCHEQUER_BIND_ADDR":   ":9000",
-	"EXCHEQUER_ORIGIN":      "http://localhost:9000",
+	"EXCHEQUER_MAINTENANCE":                  "true",
+	"EXCHEQUER_MODE":                         "test",
+	"EXCHEQUER_LOG_LEVEL":                    "debug",
+	"EXCHEQUER_CONSOLE_LOG":                  "true",
+	"EXCHEQUER_BIND_ADDR":                    ":9000",
+	"EXCHEQUER_ORIGIN":                       "http://localhost:9000",
+	"EXCHEQUER_ADYEN_API_KEY":                "my api key",
+	"EXCHEQUER_ADYEN_LIVE":                   "true",
+	"EXCHEQUER_ADYEN_URL_PREFIX":             "1797a841fbb37ca7-AdyenDemo",
+	"EXCHEQUER_ADYEN_WEBHOOK_USE_BASIC_AUTH": "true",
+	"EXCHEQUER_ADYEN_WEBHOOK_USERNAME":       "admin",
+	"EXCHEQUER_ADYEN_WEBHOOK_PASSWORD":       "supersecretpassword",
+	"EXCHEQUER_ADYEN_WEBHOOK_VERIFY_HMAC":    "true",
+	"EXCHEQUER_ADYEN_WEBHOOK_HMAC_SECRET":    "44782DEF547AAA06C910C43932B1EB0C71FC68D9D0C057550C48EC2ACF6BA056",
 }
 
 func TestConfig(t *testing.T) {
@@ -34,6 +42,14 @@ func TestConfig(t *testing.T) {
 	require.True(t, conf.ConsoleLog)
 	require.Equal(t, testEnv["EXCHEQUER_BIND_ADDR"], conf.BindAddr)
 	require.Equal(t, testEnv["EXCHEQUER_ORIGIN"], conf.Origin)
+	require.Equal(t, testEnv["EXCHEQUER_ADYEN_API_KEY"], conf.Adyen.APIKey)
+	require.True(t, conf.Adyen.Live)
+	require.Equal(t, testEnv["EXCHEQUER_ADYEN_URL_PREFIX"], conf.Adyen.URLPrefix)
+	require.True(t, conf.Adyen.Webhook.UseBasicAuth)
+	require.Equal(t, testEnv["EXCHEQUER_ADYEN_WEBHOOK_USERNAME"], conf.Adyen.Webhook.Username)
+	require.Equal(t, testEnv["EXCHEQUER_ADYEN_WEBHOOK_PASSWORD"], conf.Adyen.Webhook.Password)
+	require.True(t, conf.Adyen.Webhook.VerifyHMAC)
+	require.Equal(t, testEnv["EXCHEQUER_ADYEN_WEBHOOK_HMAC_SECRET"], conf.Adyen.Webhook.HMACSecret)
 }
 
 // Returns the current environment for the specified keys, or if no keys are specified
